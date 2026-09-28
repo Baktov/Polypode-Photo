@@ -30,8 +30,15 @@ au plus).
 - Hors combat seulement : le mode photo se ferme de lui-même à l'entrée en combat. WoW n'affiche
   le modèle d'un membre que s'il est à proximité (sinon « hors de vue »).
 
-Un **clic droit** sur le bouton ouvre les options (mémorisées pour chaque personnage ; Échap ou
-la croix pour fermer) :
+Les options (mémorisées pour chaque personnage) se règlent à deux endroits, qui montrent les
+mêmes valeurs :
+
+- **clic droit** sur le bouton « Photo » : petite fenêtre (Échap ou la croix pour fermer) ;
+- **Options → AddOns → Polypode → Photo** (ou « Polypode Photo » si le panneau de Polypode est
+  absent) : les mêmes cases, un bouton **Choisir le fond** qui ouvre le même menu de fonds (le
+  choix actuel y est coché) et un bouton **Lancer le mode photo**.
+
+Options :
 
 - **Masquer l'interface** (oui par défaut) ;
 - **Fond** : voile sombre en dégradé (par défaut), l'un des **168 écrans de chargement** de WoW
@@ -73,5 +80,6 @@ dans `gen_backgrounds.py`, régénérer. Ne jamais deviner un recadrage.
 
 ## Version
 
+`1.1.0` : options aussi dans Options → AddOns → Polypode → Photo.
 `1.0.0` : mode photo sorti de Polypode 0.46.1 (options, 168 écrans de chargement, illustrations
 du guide, familiers, zoom et déplacement des modèles).

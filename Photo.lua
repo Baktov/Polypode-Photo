@@ -414,7 +414,69 @@ function P.StopPhotoMode()
 	end
 end
 
--- OPTIONS (clic droit sur le bouton « Photo ») -----------------------------------------
+-- OPTIONS (clic droit sur le bouton « Photo », et Options → AddOns → Polypode → Photo) ---
+
+-- Cases communes aux deux emplacements : { champ de PolypodePhotoDB, libellé, aide }.
+local CHECK_OPTIONS = {
+	{ "hideUI", "Masquer l'interface", "Masque toute l'interface pendant le mode photo (comme Alt + Z)." },
+	{ "showName", "Afficher le nom des personnages", "Nom de chaque personnage sous son modèle, en couleur de classe." },
+	{ "showDetails", "Afficher classe, spé, niveau et niveau d'objet",
+		"Ligne de détails sous le nom. La spé et le niveau d'objet des autres membres viennent de leur Polypode." },
+	{ "showPets", "Afficher les familiers (chasseur, démoniste...)",
+		"Familier présent de chaque membre, juste après lui, avec « Familier de ... »." },
+}
+
+local function IsBackgroundSelected(file)
+	return PhotoSettings().background == file
+end
+
+local function SelectBackground(file)
+	PhotoSettings().background = file
+end
+
+-- Remplit un menu Blizzard avec les fonds : voile, écrans de chargement par extension (celui de
+-- WoW Forever en tête sur ce client), puis donjons et raids du guide par extension. Commun à la
+-- liste déroulante de la fenêtre du clic droit et au bouton du panneau d'options.
+local function BuildBackgroundMenu(root)
+	local function AddRadios(menu, items)
+		menu:SetScrollMode(320)
+		for _, item in ipairs(items) do
+			menu:CreateRadio(item.name, IsBackgroundSelected, SelectBackground, item.image)
+		end
+	end
+	root:SetScrollMode(360)
+	root:CreateRadio("Voile sombre (sans image)", IsBackgroundSelected, SelectBackground, "")
+	local loading = root:CreateButton("Écrans de chargement")
+	local interface = select(4, GetBuildInfo()) or 0
+	local isForever = interface >= 16000 and interface < 20000
+	local groups = {}
+	for _, group in ipairs(ns.LOADING_SCREENS) do
+		if isForever and group.name == "WoW Forever" then
+			table.insert(groups, 1, group)
+		else
+			groups[#groups + 1] = group
+		end
+	end
+	for _, group in ipairs(groups) do
+		local groupMenu = loading:CreateButton(group.name)
+		groupMenu:SetScrollMode(320)
+		for _, item in ipairs(group.items) do
+			groupMenu:CreateRadio(item[1], IsBackgroundSelected, SelectBackground, "ls:" .. item[2])
+		end
+	end
+	for _, tier in ipairs(JournalTiers()) do
+		local tierMenu = root:CreateButton(tier.name)
+		if #tier.dungeons > 0 then
+			AddRadios(tierMenu:CreateButton("Donjons"), tier.dungeons)
+		end
+		if #tier.raids > 0 then
+			AddRadios(tierMenu:CreateButton("Raids"), tier.raids)
+		end
+	end
+end
+
+local optionChecks = {} -- cases de la fenêtre du clic droit, [champ] = case
+local backgroundDropdown
 
 local function CreateCheck(parent, label, field, anchor)
 	local check = CreateFrame("CheckButton", nil, parent, "UICheckButtonTemplate")
@@ -429,6 +491,7 @@ local function CreateCheck(parent, label, field, anchor)
 	check:SetScript("OnClick", function(self)
 		PhotoSettings()[field] = self:GetChecked() and true or false
 	end)
+	optionChecks[field] = check
 	return check
 end
 
@@ -456,67 +519,28 @@ local function BuildOptions()
 	closeBtn:SetPoint("TOPRIGHT", -2, -2)
 	optionsFrame.CloseButton = closeBtn
 
-	-- Ancrée au cadre, pas au titre : le skin EllesmereUI recentre le titre dans sa barre.
-	local hideCheck = CreateCheck(optionsFrame, "Masquer l'interface", "hideUI", title)
-	hideCheck:ClearAllPoints()
-	hideCheck:SetPoint("TOPLEFT", optionsFrame, "TOPLEFT", 10, -34)
-	local nameCheck = CreateCheck(optionsFrame, "Afficher le nom des personnages", "showName", hideCheck)
-	local detailsCheck = CreateCheck(optionsFrame, "Afficher classe, spé, niveau et niveau d'objet",
-		"showDetails", nameCheck)
-	local petsCheck = CreateCheck(optionsFrame, "Afficher les familiers (chasseur, démoniste...)",
-		"showPets", detailsCheck)
+	-- Première case ancrée au cadre, pas au titre : le skin EllesmereUI recentre le titre dans
+	-- sa barre.
+	local previous
+	for i, option in ipairs(CHECK_OPTIONS) do
+		previous = CreateCheck(optionsFrame, option[2], option[1], previous or title)
+		if i == 1 then
+			previous:ClearAllPoints()
+			previous:SetPoint("TOPLEFT", optionsFrame, "TOPLEFT", 10, -34)
+		end
+	end
+	local petsCheck = previous
 
 	-- Fond : voile sombre ou un écran de chargement (menu Blizzard, défilant).
 	local bgLabel = optionsFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	bgLabel:SetPoint("TOPLEFT", petsCheck, "BOTTOMLEFT", 4, -10)
 	bgLabel:SetText("Fond :")
 
-	local dropdown = CreateFrame("DropdownButton", nil, optionsFrame, "WowStyle1DropdownTemplate")
-	dropdown:SetPoint("LEFT", bgLabel, "RIGHT", 8, 0)
-	dropdown:SetPoint("RIGHT", optionsFrame, "RIGHT", -12, 0)
-	local function IsSelected(file)
-		return PhotoSettings().background == file
-	end
-	local function SetSelected(file)
-		PhotoSettings().background = file
-	end
-	-- Sous-menus : écrans de chargement, puis donjons et raids du guide par extension.
-	local function AddRadios(menu, items)
-		menu:SetScrollMode(320)
-		for _, item in ipairs(items) do
-			menu:CreateRadio(item.name, IsSelected, SetSelected, item.image)
-		end
-	end
-	dropdown:SetupMenu(function(_, root)
-		root:SetScrollMode(360)
-		root:CreateRadio("Voile sombre (sans image)", IsSelected, SetSelected, "")
-		-- Écrans de chargement par extension ; sur WoW Forever, son groupe vient en premier.
-		local loading = root:CreateButton("Écrans de chargement")
-		local isForever = (select(4, GetBuildInfo()) or 0) >= 16000 and (select(4, GetBuildInfo()) or 0) < 20000
-		local groups = {}
-		for _, group in ipairs(ns.LOADING_SCREENS) do
-			if isForever and group.name == "WoW Forever" then
-				table.insert(groups, 1, group)
-			else
-				groups[#groups + 1] = group
-			end
-		end
-		for _, group in ipairs(groups) do
-			local groupMenu = loading:CreateButton(group.name)
-			groupMenu:SetScrollMode(320)
-			for _, item in ipairs(group.items) do
-				groupMenu:CreateRadio(item[1], IsSelected, SetSelected, "ls:" .. item[2])
-			end
-		end
-		for _, tier in ipairs(JournalTiers()) do
-			local tierMenu = root:CreateButton(tier.name)
-			if #tier.dungeons > 0 then
-				AddRadios(tierMenu:CreateButton("Donjons"), tier.dungeons)
-			end
-			if #tier.raids > 0 then
-				AddRadios(tierMenu:CreateButton("Raids"), tier.raids)
-			end
-		end
+	backgroundDropdown = CreateFrame("DropdownButton", nil, optionsFrame, "WowStyle1DropdownTemplate")
+	backgroundDropdown:SetPoint("LEFT", bgLabel, "RIGHT", 8, 0)
+	backgroundDropdown:SetPoint("RIGHT", optionsFrame, "RIGHT", -12, 0)
+	backgroundDropdown:SetupMenu(function(_, root)
+		BuildBackgroundMenu(root)
 	end)
 
 	P.ui.photoOptions = optionsFrame
@@ -532,9 +556,64 @@ function P.TogglePhotoOptions(owner)
 		optionsFrame:Hide()
 		return
 	end
+	-- Réglages relus : ils ont pu changer dans le panneau d'options.
+	for field, check in pairs(optionChecks) do
+		check:SetChecked(PhotoSettings()[field])
+	end
+	backgroundDropdown:GenerateMenu()
 	optionsFrame:ClearAllPoints()
 	optionsFrame:SetPoint("TOPRIGHT", owner, "BOTTOMRIGHT", 0, -4)
 	optionsFrame:Show()
+end
+
+-- Panneau Options → AddOns : sous-catégorie « Photo » de Polypode (P.optionsCategory, créée à
+-- PLAYER_LOGIN par Polypode), ou catégorie « Polypode Photo » à part si elle manque. Mêmes
+-- réglages que la fenêtre du clic droit (proxys sur PolypodePhotoDB) ; le fond se choisit par
+-- un bouton qui ouvre le même menu (les listes du panneau ne gèrent pas les sous-menus).
+local function BuildSettingsPanel()
+	if not (Settings and Settings.RegisterProxySetting) then
+		return
+	end
+	local category, layout
+	if P.optionsCategory and Settings.RegisterVerticalLayoutSubcategory then
+		category, layout = Settings.RegisterVerticalLayoutSubcategory(P.optionsCategory, "Photo")
+	else
+		category, layout = Settings.RegisterVerticalLayoutCategory("Polypode Photo")
+	end
+
+	for _, option in ipairs(CHECK_OPTIONS) do
+		local field = option[1]
+		local setting = Settings.RegisterProxySetting(category, "POLYPODE_PHOTO_" .. field:upper(),
+			Settings.VarType.Boolean, option[2], DEFAULTS[field],
+			function()
+				return PhotoSettings()[field]
+			end,
+			function(value)
+				PhotoSettings()[field] = value
+			end)
+		Settings.CreateCheckbox(category, setting, option[3])
+	end
+
+	if CreateSettingsButtonInitializer and layout and MenuUtil and MenuUtil.CreateContextMenu then
+		layout:AddInitializer(CreateSettingsButtonInitializer("Fond du mode photo", "Choisir le fond",
+			function(button)
+				MenuUtil.CreateContextMenu(button, function(_, root)
+					BuildBackgroundMenu(root)
+				end)
+			end,
+			"Voile sombre, écran de chargement (par extension) ou illustration d'un donjon ou d'un "
+			.. "raid du guide de l'aventurier. Le choix est coché dans le menu.", true))
+		layout:AddInitializer(CreateSettingsButtonInitializer("Mode photo", "Lancer le mode photo",
+			function()
+				if SettingsPanel and SettingsPanel:IsShown() then
+					HideUIPanel(SettingsPanel)
+				end
+				P.StartPhotoMode()
+			end,
+			"Membres du groupe en pied, côte à côte. Échap pour revenir au jeu.", true))
+	end
+
+	Settings.RegisterAddOnCategory(category)
 end
 
 -- INTÉGRATION À POLYPODE -----------------------------------------------------------------
@@ -585,6 +664,7 @@ end
 local events = CreateFrame("Frame")
 events:RegisterEvent("ADDON_LOADED")
 events:RegisterEvent("PLAYER_REGEN_DISABLED") -- entrée en combat : fin du mode photo
+events:RegisterEvent("PLAYER_LOGIN") -- panneau d'options, après celui de Polypode
 events:SetScript("OnEvent", function(_, event, addonName)
 	if event == "ADDON_LOADED" and addonName == ADDON_NAME then
 		-- Réglages par personnage ; repris une fois de l'ancien réglage de Polypode
@@ -602,6 +682,9 @@ events:SetScript("OnEvent", function(_, event, addonName)
 				PolypodePhotoDB[key] = value
 			end
 		end
+	elseif event == "PLAYER_LOGIN" then
+		-- Différé d'une image : Polypode crée P.optionsCategory à son propre PLAYER_LOGIN.
+		C_Timer.After(0, BuildSettingsPanel)
 	elseif event == "PLAYER_REGEN_DISABLED" then
 		-- Avant le verrouillage de combat : l'interface peut encore être réaffichée.
 		P.StopPhotoMode()
