@@ -3,8 +3,8 @@
 local ADDON_NAME, ns = ...
 local P = Polypode -- dépendance obligatoire (## Dependencies: Polypode), chargée avant nous
 
--- Addon compagnon de Polypode, indépendant : il ajoute lui-même son bouton « Photo » à la
--- barre de titre de la fenêtre Polypode (après P.BuildUI) et sa commande /poly photo
+-- Addon compagnon de Polypode, indépendant : il ajoute son bouton « Photo » à la barre de
+-- titre de la fenêtre Polypode (P.AddTitleButton) et sa commande /poly photo
 -- (P.RegisterSlashCommand) ; désactivé dans la liste des AddOns, Polypode fonctionne sans lui.
 -- Bouton « Photo » ou /poly photo (P.StartPhotoMode) : chaque membre du groupe (soi compris)
 -- apparaît en pied, côte à côte. Options (clic droit sur le bouton, P.TogglePhotoOptions ;
@@ -618,43 +618,29 @@ end
 
 -- INTÉGRATION À POLYPODE -----------------------------------------------------------------
 
--- Bouton « Photo » dans la barre de titre de la fenêtre Polypode, à gauche du bouton
--- « Quêtes » ; créé dès que la fenêtre existe (P.BuildUI la construit à la première ouverture).
-local photoButton
-local function AddPhotoButton()
-	if photoButton or not (P.ui and P.ui.frame) then
-		return
-	end
-	local anchor = P.ui.questsButton or P.ui.closeButton
-	photoButton = CreateFrame("Button", nil, P.ui.frame, "UIPanelButtonTemplate")
-	photoButton:SetSize(60, 20)
-	photoButton:SetPoint("RIGHT", anchor, "LEFT", -4, 0)
-	photoButton:SetText("Photo")
-	photoButton:RegisterForClicks("LeftButtonUp", "RightButtonUp")
-	photoButton:SetScript("OnClick", function(self, mouseButton)
+-- Bouton « Photo » dans la barre de titre de la fenêtre Polypode (P.AddTitleButton : Polypode
+-- l'empile avec les boutons des autres addons compagnons et le crée avec la fenêtre).
+P.AddTitleButton({
+	text = "Photo",
+	width = 60,
+	rightClick = true,
+	onClick = function(self, mouseButton)
 		if mouseButton == "RightButton" then
 			P.TogglePhotoOptions(self)
 		else
 			P.StartPhotoMode()
 		end
-	end)
-	photoButton:SetScript("OnEnter", function(self)
-		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-		GameTooltip:AddLine("Photo")
-		GameTooltip:AddLine("Clic gauche : affiche en pied, côte à côte, chaque membre du groupe "
-			.. "(interface masquée selon les options). Échap pour revenir au jeu. Hors combat "
-			.. "seulement.", 1, 1, 1, true)
-		GameTooltip:AddLine("Clic droit : options (interface, fond, nom, détails, familiers)", 1, 1, 1, true)
-		GameTooltip:Show()
-	end)
-	photoButton:SetScript("OnLeave", GameTooltip_Hide)
-	P.ui.photoButton = photoButton
-	if P.SkinButton then
-		P.SkinButton(photoButton)
-	end
-end
-hooksecurefunc(P, "BuildUI", AddPhotoButton)
-AddPhotoButton() -- fenêtre déjà construite (chargement tardif)
+	end,
+	tooltip = {
+		"Photo",
+		"Clic gauche : affiche en pied, côte à côte, chaque membre du groupe (interface masquée "
+			.. "selon les options). Échap pour revenir au jeu. Hors combat seulement.",
+		"Clic droit : options (interface, fond, nom, détails, familiers)",
+	},
+	onCreate = function(button)
+		P.ui.photoButton = button
+	end,
+})
 
 if P.RegisterSlashCommand then
 	P.RegisterSlashCommand("photo", P.StartPhotoMode,

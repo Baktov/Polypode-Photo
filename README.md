@@ -19,7 +19,7 @@ personnage). Désactivé, Polypode fonctionne normalement, sans bouton « Photo 
 
 ## Utilisation
 
-Le bouton **Photo** (barre de titre de la fenêtre Polypode, à gauche de « Quêtes ») ou
+Le bouton **Photo** (barre de titre de la fenêtre Polypode, à gauche de la croix) ou
 `/poly photo` affiche **en pied, côte à côte**, chaque membre du groupe (vous compris, 10 modèles
 au plus).
 
@@ -80,6 +80,7 @@ dans `gen_backgrounds.py`, régénérer. Ne jamais deviner un recadrage.
 
 ## Version
 
+`1.1.1` : bouton ajouté par `P.AddTitleButton` de Polypode 0.49.0 (empilé avec celui de Polypode Quêtes).
 `1.1.0` : options aussi dans Options → AddOns → Polypode → Photo.
 `1.0.0` : mode photo sorti de Polypode 0.46.1 (options, 168 écrans de chargement, illustrations
 du guide, familiers, zoom et déplacement des modèles).
