@@ -1,0 +1,29 @@
+# CLAUDE.md — Polypode Photo (Addon WoW)
+
+Addon compagnon de **Polypode** (dossier voisin `../Polypode`, dépôt séparé) : le mode photo,
+sorti de Polypode 0.46.1 pour pouvoir être chargé ou non. Les conventions de Polypode
+s'appliquent (voir `../Polypode/CLAUDE.md`) : commentaires en français, code en anglais, pas de
+librairie externe, pas de `print()`, bloc `-- Polypode Photo: Fichier — rôle` en tête de fichier,
+tout contenu de taille variable défile, Retail (120000) et WoW Forever (16001) avec tests
+d'existence des API récentes.
+
+## Architecture
+
+| Fichier | Rôle |
+|---|---|
+| `Polypode_Photo.toc` | `## Dependencies: Polypode`, SavedVariables par personnage `PolypodePhotoDB` ; ordre `Backgrounds → Photo` |
+| `Backgrounds.lua` | Données **générées** (`tools/gen_backgrounds.py`) : `ns.LOADING_SCREENS` = groupes par extension `{ name, items = { { nom, fichier [, u0, u1, v0, v1] } } }` (zone utile mesurée ; toute image s'affiche en 16:9). Ne pas éditer à la main |
+| `Photo.lua` | Mode photo : `P.StartPhotoMode`, `P.StopPhotoMode`, `P.TogglePhotoOptions` (fonctions ajoutées à la table `Polypode`), cadre sans parent `P.ui.photoFrame`, options `P.ui.photoOptions` (`PolypodePhotoDB` : `hideUI`, `background`, `showName`, `showDetails`, `showPets`). Intégration : bouton `P.ui.photoButton` créé après `P.BuildUI` (`hooksecurefunc`), à gauche de `P.ui.questsButton` ; commande via `P.RegisterSlashCommand("photo", ...)` ; `PLAYER_REGEN_DISABLED` ferme le mode photo ; migration unique de `PolypodeCharDB.photo` |
+| `tools/` | `loadingscreens.csv` (listfile filtré), `measure_backgrounds.py` → `measures.json`, `gen_backgrounds.py` → `../Backgrounds.lua` (noms français par extension) |
+
+## Dépendances vers Polypode (API publique utilisée)
+
+`P.BuildUI` (accroche), `P.ui.frame`, `P.ui.questsButton` / `P.ui.closeButton`,
+`P.RegisterSlashCommand`, `P.SkinFrame`, `P.SkinButton`, `P.UnitNameParts`, `P.JoinSurname`,
+`P.GetCharacterStatus`, `P.db.roster`. Toute évolution de ces fonctions dans Polypode doit
+rester compatible, ou ce fichier doit suivre.
+
+## Après chaque modification
+
+Mettre à jour `README.md` (et ce fichier si l'architecture change), commiter puis pousser sur
+`origin` (https://github.com/Baktov/Polypode-Photo).
