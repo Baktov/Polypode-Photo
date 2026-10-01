@@ -537,11 +537,17 @@ local function BuildOptions()
 	bgLabel:SetText("Fond :")
 
 	backgroundDropdown = CreateFrame("DropdownButton", nil, optionsFrame, "WowStyle1DropdownTemplate")
+	-- Largeur fixe jusqu'au bord droit (marge 12) plutôt qu'un second ancrage : le skin ElvUI
+	-- impose une largeur à la liste.
+	local dropdownWidth = optionsFrame:GetWidth() - 14 - bgLabel:GetStringWidth() - 8 - 12
 	backgroundDropdown:SetPoint("LEFT", bgLabel, "RIGHT", 8, 0)
-	backgroundDropdown:SetPoint("RIGHT", optionsFrame, "RIGHT", -12, 0)
+	backgroundDropdown:SetWidth(dropdownWidth)
 	backgroundDropdown:SetupMenu(function(_, root)
 		BuildBackgroundMenu(root)
 	end)
+	if P.SkinDropdown then -- Polypode 0.51.3 : skin EllesmereUI / ElvUI
+		P.SkinDropdown(backgroundDropdown, dropdownWidth)
+	end
 
 	P.ui.photoOptions = optionsFrame
 	P.SkinFrame(optionsFrame)
