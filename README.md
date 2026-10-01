@@ -80,6 +80,7 @@ dans `gen_backgrounds.py`, régénérer. Ne jamais deviner un recadrage.
 
 ## Version
 
+`1.1.3` : cases à cocher des options skinnées EllesmereUI / ElvUI (`P.SkinCheckBox`, Polypode 0.53.3).
 `1.1.2` : liste déroulante « Fond » des options skinnée EllesmereUI / ElvUI (`P.SkinDropdown`, Polypode 0.51.3).
 `1.1.1` : bouton ajouté par `P.AddTitleButton` de Polypode 0.49.0 (empilé avec celui de Polypode Quêtes).
 `1.1.0` : options aussi dans Options → AddOns → Polypode → Photo.

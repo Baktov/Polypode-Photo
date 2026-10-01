@@ -492,6 +492,9 @@ local function CreateCheck(parent, label, field, anchor)
 		PhotoSettings()[field] = self:GetChecked() and true or false
 	end)
 	optionChecks[field] = check
+	if P.SkinCheckBox then -- Polypode 0.53.3 : skin EllesmereUI / ElvUI
+		P.SkinCheckBox(check)
+	end
 	return check
 end
 
