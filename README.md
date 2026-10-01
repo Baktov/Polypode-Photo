@@ -23,9 +23,12 @@ Le bouton **Photo** (barre de titre de la fenêtre Polypode, à gauche de la cro
 `/poly photo` affiche **en pied, côte à côte**, chaque membre du groupe (vous compris, 10 modèles
 au plus).
 
-- La **molette** sur un personnage le zoome ou le dézoome, et un **clic gauche maintenu** le
-  déplace sur l'écran (son nom et ses détails suivent) ; il garde sa place au relâchement. Chaque
-  personnage se règle séparément ; tout est remis en place à chaque ouverture.
+- Les personnages s'affichent à **75 %** de leur taille en pied, de face.
+- Sur un personnage : la **molette** le zoome ou le dézoome, un **clic gauche maintenu** le fait
+  tourner sur lui-même (en glissant à gauche ou à droite), un **clic droit maintenu** le déplace
+  n'importe où sur l'écran (son nom et ses détails suivent). Il garde sa place et son orientation
+  au relâchement. Chaque personnage se règle séparément ; tout est remis en place à chaque
+  ouverture.
 - **Échap** revient au jeu ; **Impr. écran** fait une capture comme d'habitude.
 - Hors combat seulement : le mode photo se ferme de lui-même à l'entrée en combat. WoW n'affiche
   le modèle d'un membre que s'il est à proximité (sinon « hors de vue »).
@@ -80,6 +83,7 @@ dans `gen_backgrounds.py`, régénérer. Ne jamais deviner un recadrage.
 
 ## Version
 
+`1.2.0` : clic gauche maintenu pour tourner un personnage, clic droit maintenu pour le déplacer ; personnages à 75 % de leur taille à l'ouverture.
 `1.1.3` : cases à cocher des options skinnées EllesmereUI / ElvUI (`P.SkinCheckBox`, Polypode 0.53.3).
 `1.1.2` : liste déroulante « Fond » des options skinnée EllesmereUI / ElvUI (`P.SkinDropdown`, Polypode 0.51.3).
 `1.1.1` : bouton ajouté par `P.AddTitleButton` de Polypode 0.49.0 (empilé avec celui de Polypode Quêtes).

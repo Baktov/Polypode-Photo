@@ -2,7 +2,7 @@
 ## Title: Polypode Photo
 ## Notes: Mode photo pour Polypode : les membres du groupe en pied, côte à côte, sur un fond au choix.
 ## Author: Baktov
-## Version: 1.1.3
+## Version: 1.2.0
 ## Dependencies: Polypode
 ## SavedVariablesPerCharacter: PolypodePhotoDB
 ## Category: Polypode

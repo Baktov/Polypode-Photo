@@ -20,7 +20,8 @@ local P = Polypode -- dépendance obligatoire (## Dependencies: Polypode), charg
 --     d'objet des autres membres : état envoyé par leur Polypode, P.GetCharacterStatus) ;
 --   showPets — familiers (chasseur, démoniste, chevalier de la mort...) juste après leur maître
 --     (unités pet / partypetN / raidpetN), « Familier de ... » en détails.
--- Molette sur un modèle : zoom avant / arrière ; glisser : le déplacer. Échap revient au jeu (P.StopPhotoMode) ; les
+-- Molette sur un modèle : zoom avant / arrière ; clic gauche maintenu : le tourner sur lui-même ;
+-- clic droit maintenu : le déplacer. Modèles affichés à 75 % de la taille en pied. Échap revient au jeu (P.StopPhotoMode) ; les
 -- autres touches passent au jeu (Impr. écran pour la capture). Hors combat seulement : UIParent ne peut pas être masqué / réaffiché en
 -- combat, le mode photo se ferme donc à l'entrée en combat (PLAYER_REGEN_DISABLED, avant le
 -- verrouillage). Le cadre n'a pas de parent, pour rester visible quand UIParent est masqué.
@@ -30,6 +31,8 @@ local MAX_MODELS = 10 -- au-delà (grand raid), seuls les premiers modèles sont
 local HINT_DURATION = 4 -- secondes d'affichage du rappel « Échap »
 local ZOOM_STEP = 0.1 -- variation de la distance de caméra par cran de molette
 local ZOOM_MIN, ZOOM_MAX = 0.3, 3 -- distance de caméra (1 = en pied)
+local MODEL_SCALE = 0.75 -- taille des modèles à l'ouverture (1 = toute la hauteur disponible)
+local ROTATE_SPEED = 0.02 -- rotation (radians) par point de déplacement horizontal du curseur
 -- Zone utile des illustrations du guide dans leur texture 512 × 512 (recadrages du guide,
 -- Blizzard_EncounterJournal.xml) : { u0, u1, v0, v1, proportions largeur / hauteur }.
 local JOURNAL_REGIONS = {
@@ -197,8 +200,8 @@ local function Build()
 
 	hint = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightLarge")
 	hint:SetPoint("TOP", 0, -30)
-	hint:SetText("Mode photo — glisser un personnage pour le déplacer, molette pour zoomer, "
-		.. "Échap pour revenir au jeu, Impr. écran pour une capture")
+	hint:SetText("Mode photo — clic gauche maintenu : tourner, clic droit maintenu : déplacer, "
+		.. "molette : zoomer, Échap pour revenir au jeu, Impr. écran pour une capture")
 
 	-- Échap ferme le mode photo et n'atteint pas le jeu (pas de menu) ; les autres touches
 	-- passent au jeu.
@@ -225,12 +228,34 @@ local function GetModel(i)
 			self.zoom = math.max(ZOOM_MIN, math.min(ZOOM_MAX, (self.zoom or 1) - delta * ZOOM_STEP))
 			self:SetCamDistanceScale(self.zoom)
 		end)
-		-- Clic gauche maintenu : déplace le modèle (son nom et ses détails le suivent) ; il
-		-- garde sa place au relâchement, jusqu'à la prochaine ouverture du mode photo.
+		-- Clic gauche maintenu : tourne le modèle sur lui-même, selon le déplacement horizontal
+		-- du curseur depuis l'appui.
 		model:EnableMouse(true)
+		model:SetScript("OnMouseDown", function(self, button)
+			if button == "LeftButton" then
+				self.rotateFromX = GetCursorPosition() / self:GetEffectiveScale()
+				self.rotateFromFacing = self:GetFacing()
+			end
+		end)
+		model:SetScript("OnMouseUp", function(self, button)
+			if button == "LeftButton" then
+				self.rotateFromX = nil
+			end
+		end)
+		model:SetScript("OnUpdate", function(self)
+			if self.rotateFromX then
+				local x = GetCursorPosition() / self:GetEffectiveScale()
+				self:SetFacing(self.rotateFromFacing + (x - self.rotateFromX) * ROTATE_SPEED)
+			end
+		end)
+		model:SetScript("OnHide", function(self)
+			self.rotateFromX = nil
+		end)
+		-- Clic droit maintenu : déplace le modèle (son nom et ses détails le suivent) ; il garde
+		-- sa place et son orientation au relâchement, jusqu'à la prochaine ouverture du mode photo.
 		model:SetMovable(true)
 		model:SetClampedToScreen(true)
-		model:RegisterForDrag("LeftButton")
+		model:RegisterForDrag("RightButton")
 		model:SetScript("OnDragStart", model.StartMoving)
 		model:SetScript("OnDragStop", model.StopMovingOrSizing)
 		local label = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalHuge")
@@ -316,10 +341,11 @@ local function LayoutModels()
 		local model, label, details = entry.model, entry.label, entry.details
 		model:ClearAllPoints()
 		model:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", (i - 1) * slot, bottom)
-		model:SetSize(slot, height * 0.8)
+		model:SetSize(slot, height * 0.8 * MODEL_SCALE)
 		model:ClearModel()
 		model:SetUnit(unit)
 		model:SetPortraitZoom(0) -- en pied, pas en portrait
+		model:SetFacing(0) -- de face
 		model.zoom = 1
 		model:SetCamDistanceScale(1)
 		model:Show()
