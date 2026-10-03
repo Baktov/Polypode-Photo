@@ -24,7 +24,7 @@ d'existence des API récentes.
 ## Dépendances vers Polypode (API publique utilisée)
 
 `P.AddTitleButton`, `P.optionsCategory` (parent du panneau d'options),
-`P.RegisterSlashCommand`, `P.SkinFrame`, `P.SkinDropdown`, `P.SkinCheckBox` (si présents), `P.SkinButton`, `P.UnitNameParts`, `P.JoinSurname`,
+`P.RegisterSlashCommand`, `P.ColorClicks` (si présente, Polypode 0.60.0 : descriptions des options), `P.SkinFrame`, `P.SkinDropdown`, `P.SkinCheckBox` (si présents), `P.SkinButton`, `P.UnitNameParts`, `P.JoinSurname`,
 `P.GetCharacterStatus`, `P.db.roster`. Toute évolution de ces fonctions dans Polypode doit
 rester compatible, ou ce fichier doit suivre.
 

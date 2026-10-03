@@ -83,6 +83,7 @@ dans `gen_backgrounds.py`, régénérer. Ne jamais deviner un recadrage.
 
 ## Version
 
+`1.2.1` : notions de clic en bleu dans l'infobulle du bouton et les descriptions des options (Polypode 0.60).
 `1.2.0` : clic gauche maintenu pour tourner un personnage, clic droit maintenu pour le déplacer ; personnages à 75 % de leur taille à l'ouverture.
 `1.1.3` : cases à cocher des options skinnées EllesmereUI / ElvUI (`P.SkinCheckBox`, Polypode 0.53.3).
 `1.1.2` : liste déroulante « Fond » des options skinnée EllesmereUI / ElvUI (`P.SkinDropdown`, Polypode 0.51.3).

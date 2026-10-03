@@ -626,7 +626,7 @@ local function BuildSettingsPanel()
 			function(value)
 				PhotoSettings()[field] = value
 			end)
-		Settings.CreateCheckbox(category, setting, option[3])
+		Settings.CreateCheckbox(category, setting, P.ColorClicks and P.ColorClicks(option[3]) or option[3])
 	end
 
 	if CreateSettingsButtonInitializer and layout and MenuUtil and MenuUtil.CreateContextMenu then
