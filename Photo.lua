@@ -145,7 +145,11 @@ local function GroupUnits()
 end
 
 -- Clé de roster d'une unité (royaumes comparés sans espaces : UnitName n'en a pas), ou nil.
+-- P.KeyForUnit (Polypode 2.2.3) reconnaît aussi le nom de famille de WoW Forever ; repli local.
 local function KeyForUnit(unit)
+	if P.KeyForUnit then
+		return P.KeyForUnit(unit)
+	end
 	local name, realm = P.UnitNameParts(unit)
 	if not name or (issecretvalue and issecretvalue(name)) then
 		return nil
