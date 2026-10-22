@@ -11,7 +11,7 @@ personnage). Désactivé, Polypode fonctionne normalement, sans bouton « Photo 
 
 1. Installer d'abord **Polypode** (dépendance obligatoire).
 2. Placer le dossier `Polypode_Photo` dans `World of Warcraft/_retail_/Interface/AddOns/`
-   (et, pour **WoW Forever**, dans `World of Warcraft/_classic_beta_/Interface/AddOns/`, par
+   (et, pour **WoW Forever**, dans `World of Warcraft/_forever_/Interface/AddOns/`, par
    exemple par une jonction `mklink /J`).
 3. Cocher « Polypode Photo » dans la liste des AddOns.
 
