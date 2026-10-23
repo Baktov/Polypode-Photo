@@ -81,8 +81,22 @@ dans `gen_backgrounds.py`, régénérer. Ne jamais deviner un recadrage.
 
 ---
 
+## Langues (Languages)
+
+Polypode Photo s'affiche dans la langue choisie dans Polypode (option « Langue / Language », `/poly langue`),
+par défaut celle du jeu : français, anglais, allemand, espagnol, italien ou portugais du Brésil
+(anglais pour une autre langue). Nécessite Polypode 2.9 pour choisir la langue ; avec un Polypode plus
+ancien, le module reste en français. La commande `C:/Program Files/Git/poly photo` garde son nom.
+
+*Polypode Photo follows the language chosen in Polypode ("Langue / Language" option, `/poly language`), by
+default the game's: French, English, German, Spanish, Italian or Brazilian Portuguese (English for any
+other language).*
+
+---
+
 ## Version
 
+`1.3.0` : Polypode Photo en anglais, allemand, espagnol, italien et portugais du Brésil, selon la langue choisie dans Polypode ; noms des écrans de chargement en anglais hors français. *Translated into English, German, Spanish, Italian and Brazilian Portuguese.*
 `1.2.2` : WoW Forever : les membres du groupe sont reconnus par prénom et nom de famille (spécialisation et niveau d'objet sous les modèles) ; nécessite Polypode 2.2.3 pour cela.
 `1.2.1` : notions de clic en bleu dans l'infobulle du bouton et les descriptions des options (Polypode 0.60).
 `1.2.0` : clic gauche maintenu pour tourner un personnage, clic droit maintenu pour le déplacer ; personnages à 75 % de leur taille à l'ouverture.

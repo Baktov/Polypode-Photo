@@ -2,6 +2,7 @@
 
 local ADDON_NAME, ns = ...
 local P = Polypode -- dépendance obligatoire (## Dependencies: Polypode), chargée avant nous
+local L = ns.L
 
 -- Addon compagnon de Polypode, indépendant : il ajoute son bouton « Photo » à la barre de
 -- titre de la fenêtre Polypode (P.AddTitleButton) et sa commande /poly photo
@@ -74,7 +75,7 @@ local function JournalTiers()
 	local previous = EJ_GetCurrentTier and EJ_GetCurrentTier()
 	for tier = EJ_GetNumTiers(), 1, -1 do
 		EJ_SelectTier(tier)
-		local entry = { name = EJ_GetTierInfo(tier) or ("Extension " .. tier), dungeons = {}, raids = {} }
+		local entry = { name = EJ_GetTierInfo(tier) or L["Extension %d"]:format(tier), dungeons = {}, raids = {} }
 		for _, isRaid in ipairs({ false, true }) do
 			local list = isRaid and entry.raids or entry.dungeons
 			local index = 1
@@ -178,10 +179,10 @@ local function DetailsText(unit)
 	end
 	local level = UnitLevel(unit)
 	if level and level > 0 then
-		parts[#parts + 1] = "niv. " .. level
+		parts[#parts + 1] = L["niv. %s"]:format(level)
 	end
 	if status and status.ilvl and status.ilvl > 0 then
-		parts[#parts + 1] = "ilvl " .. status.ilvl
+		parts[#parts + 1] = L["ilvl %s"]:format(status.ilvl)
 	end
 	return table.concat(parts, " · ")
 end
@@ -204,8 +205,8 @@ local function Build()
 
 	hint = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightLarge")
 	hint:SetPoint("TOP", 0, -30)
-	hint:SetText("Mode photo — clic gauche maintenu : tourner, clic droit maintenu : déplacer, "
-		.. "molette : zoomer, Échap pour revenir au jeu, Impr. écran pour une capture")
+	hint:SetText(L["Mode photo — clic gauche maintenu : tourner, clic droit maintenu : déplacer, "
+		.. "molette : zoomer, Échap pour revenir au jeu, Impr. écran pour une capture"])
 
 	-- Échap ferme le mode photo et n'atteint pas le jeu (pas de menu) ; les autres touches
 	-- passent au jeu.
@@ -370,7 +371,7 @@ local function LayoutModels()
 			end
 		end
 		if not UnitIsVisible(unit) then
-			text = text .. " |cff999999(hors de vue)|r"
+			text = text .. " |cff999999" .. L["(hors de vue)"] .. "|r"
 		end
 		label:ClearAllPoints()
 		label:SetPoint("TOP", model, "BOTTOM", 0, -8)
@@ -387,7 +388,7 @@ local function LayoutModels()
 		details:SetWidth(slot - 10)
 		if owner then
 			local ownerName, _, ownerSurname = P.UnitNameParts(owner)
-			details:SetText("Familier de " .. (P.JoinSurname(ownerName, ownerSurname) or "?"))
+			details:SetText(L["Familier de %s"]:format(P.JoinSurname(ownerName, ownerSurname) or "?"))
 		else
 			details:SetText(DetailsText(unit))
 		end
@@ -402,7 +403,7 @@ end
 
 function P.StartPhotoMode()
 	if InCombatLockdown() then
-		UIErrorsFrame:AddMessage("Mode photo impossible en combat.", 1, 0.1, 0.1)
+		UIErrorsFrame:AddMessage(L["Mode photo impossible en combat."], 1, 0.1, 0.1)
 		return
 	end
 	if not frame then
@@ -446,15 +447,18 @@ end
 
 -- OPTIONS (clic droit sur le bouton « Photo », et Options → AddOns → Polypode → Photo) ---
 
--- Cases communes aux deux emplacements : { champ de PolypodePhotoDB, libellé, aide }.
-local CHECK_OPTIONS = {
-	{ "hideUI", "Masquer l'interface", "Masque toute l'interface pendant le mode photo (comme Alt + Z)." },
-	{ "showName", "Afficher le nom des personnages", "Nom de chaque personnage sous son modèle, en couleur de classe." },
-	{ "showDetails", "Afficher classe, spé, niveau et niveau d'objet",
-		"Ligne de détails sous le nom. La spé et le niveau d'objet des autres membres viennent de leur Polypode." },
-	{ "showPets", "Afficher les familiers (chasseur, démoniste...)",
-		"Familier présent de chaque membre, juste après lui, avec « Familier de ... »." },
-}
+-- Cases communes aux deux emplacements : { champ de PolypodePhotoDB, libellé, aide } (textes lus à
+-- la construction des options, dans la langue choisie).
+local function CheckOptions()
+	return {
+		{ "hideUI", L["Masquer l'interface"], L["Masque toute l'interface pendant le mode photo (comme Alt + Z)."] },
+		{ "showName", L["Afficher le nom des personnages"], L["Nom de chaque personnage sous son modèle, en couleur de classe."] },
+		{ "showDetails", L["Afficher classe, spé, niveau et niveau d'objet"],
+			L["Ligne de détails sous le nom. La spé et le niveau d'objet des autres membres viennent de leur Polypode."] },
+		{ "showPets", L["Afficher les familiers (chasseur, démoniste...)"],
+			L["Familier présent de chaque membre, juste après lui, avec « Familier de ... »."] },
+	}
+end
 
 local function IsBackgroundSelected(file)
 	return PhotoSettings().background == file
@@ -462,6 +466,13 @@ end
 
 local function SelectBackground(file)
 	PhotoSettings().background = file
+end
+
+-- Nom affiché d'un écran de chargement ou d'un groupe : anglais (BackgroundNames.lua) dans toute
+-- langue autre que le français.
+local function BackgroundName(name)
+	local language = P.GetLanguage and P.GetLanguage() or "frFR"
+	return language ~= "frFR" and ns.BACKGROUND_NAMES_EN and ns.BACKGROUND_NAMES_EN[name] or name
 end
 
 -- Remplit un menu Blizzard avec les fonds : voile, écrans de chargement par extension (celui de
@@ -475,8 +486,8 @@ local function BuildBackgroundMenu(root)
 		end
 	end
 	root:SetScrollMode(360)
-	root:CreateRadio("Voile sombre (sans image)", IsBackgroundSelected, SelectBackground, "")
-	local loading = root:CreateButton("Écrans de chargement")
+	root:CreateRadio(L["Voile sombre (sans image)"], IsBackgroundSelected, SelectBackground, "")
+	local loading = root:CreateButton(L["Écrans de chargement"])
 	local interface = select(4, GetBuildInfo()) or 0
 	local isForever = interface >= 16000 and interface < 20000
 	local groups = {}
@@ -488,19 +499,19 @@ local function BuildBackgroundMenu(root)
 		end
 	end
 	for _, group in ipairs(groups) do
-		local groupMenu = loading:CreateButton(group.name)
+		local groupMenu = loading:CreateButton(BackgroundName(group.name))
 		groupMenu:SetScrollMode(320)
 		for _, item in ipairs(group.items) do
-			groupMenu:CreateRadio(item[1], IsBackgroundSelected, SelectBackground, "ls:" .. item[2])
+			groupMenu:CreateRadio(BackgroundName(item[1]), IsBackgroundSelected, SelectBackground, "ls:" .. item[2])
 		end
 	end
 	for _, tier in ipairs(JournalTiers()) do
 		local tierMenu = root:CreateButton(tier.name)
 		if #tier.dungeons > 0 then
-			AddRadios(tierMenu:CreateButton("Donjons"), tier.dungeons)
+			AddRadios(tierMenu:CreateButton(L["Donjons"]), tier.dungeons)
 		end
 		if #tier.raids > 0 then
-			AddRadios(tierMenu:CreateButton("Raids"), tier.raids)
+			AddRadios(tierMenu:CreateButton(L["Raids"]), tier.raids)
 		end
 	end
 end
@@ -545,7 +556,7 @@ local function BuildOptions()
 
 	local title = optionsFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 	title:SetPoint("TOPLEFT", 12, -12)
-	title:SetText("Options du mode photo")
+	title:SetText(L["Options du mode photo"])
 	optionsFrame.TitleText = title
 
 	local closeBtn = CreateFrame("Button", nil, optionsFrame, "UIPanelCloseButton")
@@ -555,7 +566,7 @@ local function BuildOptions()
 	-- Première case ancrée au cadre, pas au titre : le skin EllesmereUI recentre le titre dans
 	-- sa barre.
 	local previous
-	for i, option in ipairs(CHECK_OPTIONS) do
+	for i, option in ipairs(CheckOptions()) do
 		previous = CreateCheck(optionsFrame, option[2], option[1], previous or title)
 		if i == 1 then
 			previous:ClearAllPoints()
@@ -567,7 +578,7 @@ local function BuildOptions()
 	-- Fond : voile sombre ou un écran de chargement (menu Blizzard, défilant).
 	local bgLabel = optionsFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	bgLabel:SetPoint("TOPLEFT", petsCheck, "BOTTOMLEFT", 4, -10)
-	bgLabel:SetText("Fond :")
+	bgLabel:SetText(L["Fond :"])
 
 	backgroundDropdown = CreateFrame("DropdownButton", nil, optionsFrame, "WowStyle1DropdownTemplate")
 	-- Largeur fixe jusqu'au bord droit (marge 12) plutôt qu'un second ancrage : le skin ElvUI
@@ -615,12 +626,12 @@ local function BuildSettingsPanel()
 	end
 	local category, layout
 	if P.optionsCategory and Settings.RegisterVerticalLayoutSubcategory then
-		category, layout = Settings.RegisterVerticalLayoutSubcategory(P.optionsCategory, "Photo")
+		category, layout = Settings.RegisterVerticalLayoutSubcategory(P.optionsCategory, L["Photo"])
 	else
-		category, layout = Settings.RegisterVerticalLayoutCategory("Polypode Photo")
+		category, layout = Settings.RegisterVerticalLayoutCategory(L["Polypode Photo"])
 	end
 
-	for _, option in ipairs(CHECK_OPTIONS) do
+	for _, option in ipairs(CheckOptions()) do
 		local field = option[1]
 		local setting = Settings.RegisterProxySetting(category, "POLYPODE_PHOTO_" .. field:upper(),
 			Settings.VarType.Boolean, option[2], DEFAULTS[field],
@@ -634,22 +645,22 @@ local function BuildSettingsPanel()
 	end
 
 	if CreateSettingsButtonInitializer and layout and MenuUtil and MenuUtil.CreateContextMenu then
-		layout:AddInitializer(CreateSettingsButtonInitializer("Fond du mode photo", "Choisir le fond",
+		layout:AddInitializer(CreateSettingsButtonInitializer(L["Fond du mode photo"], L["Choisir le fond"],
 			function(button)
 				MenuUtil.CreateContextMenu(button, function(_, root)
 					BuildBackgroundMenu(root)
 				end)
 			end,
-			"Voile sombre, écran de chargement (par extension) ou illustration d'un donjon ou d'un "
-			.. "raid du guide de l'aventurier. Le choix est coché dans le menu.", true))
-		layout:AddInitializer(CreateSettingsButtonInitializer("Mode photo", "Lancer le mode photo",
+			L["Voile sombre, écran de chargement (par extension) ou illustration d'un donjon ou d'un "
+			.. "raid du guide de l'aventurier. Le choix est coché dans le menu."], true))
+		layout:AddInitializer(CreateSettingsButtonInitializer(L["Mode photo"], L["Lancer le mode photo"],
 			function()
 				if SettingsPanel and SettingsPanel:IsShown() then
 					HideUIPanel(SettingsPanel)
 				end
 				P.StartPhotoMode()
 			end,
-			"Membres du groupe en pied, côte à côte. Échap pour revenir au jeu.", true))
+			L["Membres du groupe en pied, côte à côte. Échap pour revenir au jeu."], true))
 	end
 
 	Settings.RegisterAddOnCategory(category)
@@ -659,32 +670,37 @@ end
 
 -- Bouton « Photo » dans la barre de titre de la fenêtre Polypode (P.AddTitleButton : Polypode
 -- l'empile avec les boutons des autres addons compagnons et le crée avec la fenêtre).
-P.AddTitleButton({
-	text = "Photo",
-	width = 60,
-	rightClick = true,
-	onClick = function(self, mouseButton)
-		if mouseButton == "RightButton" then
-			P.TogglePhotoOptions(self)
-		else
-			P.StartPhotoMode()
-		end
-	end,
-	tooltip = {
-		"Photo",
-		"Clic gauche : affiche en pied, côte à côte, chaque membre du groupe (interface masquée "
-			.. "selon les options). Échap pour revenir au jeu. Hors combat seulement.",
-		"Clic droit : options (interface, fond, nom, détails, familiers)",
-	},
-	onCreate = function(button)
-		P.ui.photoButton = button
-	end,
-})
+ns.OnLanguageApplied(function()
+	P.AddTitleButton({
+		text = L["Photo"],
+		width = 60,
+		rightClick = true,
+		onClick = function(self, mouseButton)
+			if mouseButton == "RightButton" then
+				P.TogglePhotoOptions(self)
+			else
+				P.StartPhotoMode()
+			end
+		end,
+		tooltip = {
+			L["Photo"],
+			L["Clic gauche : affiche en pied, côte à côte, chaque membre du groupe (interface masquée "
+				.. "selon les options). Échap pour revenir au jeu. Hors combat seulement."],
+			L["Clic droit : options (interface, fond, nom, détails, familiers)"],
+		},
+		onCreate = function(button)
+			P.ui.photoButton = button
+		end,
+	})
+end)
 
-if P.RegisterSlashCommand then
+ns.OnLanguageApplied(function()
+	if not P.RegisterSlashCommand then
+		return
+	end
 	P.RegisterSlashCommand("photo", P.StartPhotoMode,
-		"mode photo (membres du groupe en pied, Échap pour revenir)")
-end
+		L["mode photo (membres du groupe en pied, Échap pour revenir)"])
+end)
 
 local events = CreateFrame("Frame")
 events:RegisterEvent("ADDON_LOADED")

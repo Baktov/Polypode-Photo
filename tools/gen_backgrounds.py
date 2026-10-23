@@ -119,6 +119,8 @@ lines = [
     "-- chargement. Identifiants de fichier tirés du listfile communautaire wowdev (dossier",
     "-- Interface/Glues/LoadingScreens), zone utile mesurée sur chaque image (bandes noires retirées).",
     "-- Chaque écran s'affiche en 16:9 quel que soit le format de sa texture.",
+    "-- Noms anglais : BackgroundNames.lua (à compléter pour tout nouveau fond).",
+    "-- check_locale: noms propres",
     "-- ns.LOADING_SCREENS = { { name = extension, items = { { nom, fichier [, u0, u1, v0, v1] } } } }",
     "ns.LOADING_SCREENS = {",
 ]

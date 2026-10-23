@@ -16,12 +16,17 @@ d'existence des API récentes.
 
 | Fichier | Rôle |
 |---|---|
+| `Locale.lua` | Chargé en premier : table de textes `ns.L = P.NewLocale()` (repli : table qui renvoie la clé française avec un Polypode trop ancien) et `ns.OnLanguageApplied(fn)` (→ `P.OnLanguageApplied`, sinon appel immédiat) pour les textes rangés au chargement (bouton de barre de titre, aide de commande, nom pour `P.RegisterCharacterData`...). Règle commune : `MODULES.md`, « Langues » |
+| `BackgroundNames.lua` | Noms anglais des écrans de chargement (`ns.BACKGROUND_NAMES_EN[nom français]`), affichés par `BackgroundName` (Photo.lua) dans toute langue autre que le français (noms officiels des autres langues non relevés) ; à compléter pour tout nouveau fond de `tools/gen_backgrounds.py` ; marqué `-- check_locale: noms propres` (comme Backgrounds.lua) |
+| `Locales/enUS.lua`, `deDE.lua`, `esES.lua`, `itIT.lua`, `ptBR.lua` | Traductions (`P.AddTranslations(ns.L, langue, { ["texte français"] = "texte" })`, groupées par fichier, même ordre dans chaque langue ; fichier ignoré sans `P.AddTranslations`). Contrôle : `python Polypode\tools\check_locale.py Polypode_Photo` |
 | `Polypode_Photo.toc` | `## Dependencies: Polypode`, SavedVariables par personnage `PolypodePhotoDB` ; ordre `Backgrounds → Photo` |
 | `Backgrounds.lua` | Données **générées** (`tools/gen_backgrounds.py`) : `ns.LOADING_SCREENS` = groupes par extension `{ name, items = { { nom, fichier [, u0, u1, v0, v1] } } }` (zone utile mesurée ; toute image s'affiche en 16:9). Ne pas éditer à la main |
 | `Photo.lua` | Mode photo : `P.StartPhotoMode`, `P.StopPhotoMode`, `P.TogglePhotoOptions` (fonctions ajoutées à la table `Polypode`), cadre sans parent `P.ui.photoFrame`, options `P.ui.photoOptions` (`PolypodePhotoDB` : `hideUI`, `background`, `showName`, `showDetails`, `showPets`), aussi dans le panneau Options → AddOns (locale `BuildSettingsPanel`, à `PLAYER_LOGIN` + 1 image : sous-catégorie « Photo » de `P.optionsCategory` sinon catégorie « Polypode Photo » ; proxys `Settings.RegisterProxySetting` sur les mêmes champs, bouton « Choisir le fond » → `MenuUtil.CreateContextMenu` avec le même générateur `BuildBackgroundMenu`, bouton « Lancer le mode photo »). Cases communes décrites une fois dans `CHECK_OPTIONS` ; la fenêtre du clic droit relit les réglages à chaque ouverture. Intégration : bouton `P.ui.photoButton` par `P.AddTitleButton` (Polypode l'empile avec les autres boutons des compagnons) ; commande via `P.RegisterSlashCommand("photo", ...)` ; `PLAYER_REGEN_DISABLED` ferme le mode photo ; migration unique de `PolypodeCharDB.photo` |
 | `tools/` | `loadingscreens.csv` (listfile filtré), `measure_backgrounds.py` → `measures.json`, `gen_backgrounds.py` → `../Backgrounds.lua` (noms français par extension) |
 
 ## Dépendances vers Polypode (API publique utilisée)
+
+Langues (si présentes) : `P.NewLocale`, `P.AddTranslations` (Polypode 2.8), `P.OnLanguageApplied` (2.9).
 
 `P.AddTitleButton`, `P.optionsCategory` (parent du panneau d'options),
 `P.RegisterSlashCommand`, `P.ColorClicks` (si présente, Polypode 0.60.0 : descriptions des options), `P.SkinFrame`, `P.SkinDropdown`, `P.SkinCheckBox` (si présents), `P.SkinButton`, `P.UnitNameParts`, `P.JoinSurname`, `P.KeyForUnit` (si présente, Polypode 2.2.3 : clé de roster d'une unité, nom de famille de Forever compris ; repli local par prénom-royaume),
