@@ -96,6 +96,7 @@ other language).*
 
 ## Version
 
+`1.3.1` : chemins des fichiers de langue compatibles macOS.
 `1.3.0` : Polypode Photo en anglais, allemand, espagnol, italien et portugais du Brésil, selon la langue choisie dans Polypode ; noms des écrans de chargement en anglais hors français. *Translated into English, German, Spanish, Italian and Brazilian Portuguese.*
 `1.2.2` : WoW Forever : les membres du groupe sont reconnus par prénom et nom de famille (spécialisation et niveau d'objet sous les modèles) ; nécessite Polypode 2.2.3 pour cela.
 `1.2.1` : notions de clic en bleu dans l'infobulle du bouton et les descriptions des options (Polypode 0.60).

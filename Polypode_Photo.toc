@@ -8,17 +8,17 @@
 ## Notes: Photo mode for Polypode: the group members full-length, side by side, on a background of your choice.
 ## Notes-frFR: Mode photo pour Polypode : les membres du groupe en pied, côte à côte, sur un fond au choix.
 ## Author: Baktov
-## Version: 1.3.0
+## Version: 1.3.1
 ## Dependencies: Polypode
 ## SavedVariablesPerCharacter: PolypodePhotoDB
 ## Category: Polypode
 
 Locale.lua
-Locales\enUS.lua
-Locales\deDE.lua
-Locales\esES.lua
-Locales\itIT.lua
-Locales\ptBR.lua
+Locales/enUS.lua
+Locales/deDE.lua
+Locales/esES.lua
+Locales/itIT.lua
+Locales/ptBR.lua
 Backgrounds.lua
 BackgroundNames.lua
 Photo.lua
