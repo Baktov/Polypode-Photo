@@ -1,9 +1,16 @@
 # Polypode Photo
 
+*English version: [README.en.md](README.en.md)*
+
 Module **mode photo** de [Polypode](https://github.com/Baktov/polypode), sous forme d'addon
 séparé : il se charge ou non comme n'importe quel addon (liste des AddOns de WoW, par
 personnage). Désactivé, Polypode fonctionne normalement, sans bouton « Photo » ni commande
 `/poly photo`.
+
+> **Langues** : français, anglais, allemand, espagnol, italien et portugais du Brésil, selon la
+> langue choisie dans Polypode (option « Langue / Language »). Les traductions ont été faites avec
+> l'aide de Claude, l'IA d'Anthropic : les retours de joueurs dont c'est la langue maternelle sont
+> les bienvenus ([issue GitHub](https://github.com/Baktov/Polypode-Photo/issues)).
 
 ---
 
@@ -86,7 +93,7 @@ dans `gen_backgrounds.py`, régénérer. Ne jamais deviner un recadrage.
 Polypode Photo s'affiche dans la langue choisie dans Polypode (option « Langue / Language », `/poly langue`),
 par défaut celle du jeu : français, anglais, allemand, espagnol, italien ou portugais du Brésil
 (anglais pour une autre langue). Nécessite Polypode 2.9 pour choisir la langue ; avec un Polypode plus
-ancien, le module reste en français. La commande `C:/Program Files/Git/poly photo` garde son nom.
+ancien, le module reste en français. La commande `/poly photo` garde son nom.
 
 *Polypode Photo follows the language chosen in Polypode ("Langue / Language" option, `/poly language`), by
 default the game's: French, English, German, Spanish, Italian or Brazilian Portuguese (English for any
