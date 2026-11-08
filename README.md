@@ -88,6 +88,12 @@ dans `gen_backgrounds.py`, régénérer. Ne jamais deviner un recadrage.
 
 ---
 
+## Licence
+
+Polypode Photo est un logiciel libre, sous licence **GNU GPL version 3** (fichier
+[`LICENSE`](LICENSE)) : vous pouvez le reprendre, le modifier et le redistribuer, à condition de
+garder cette licence et de citer l'auteur. Copyright (C) 2026 Baktov.
+
 ## Langues (Languages)
 
 Polypode Photo s'affiche dans la langue choisie dans Polypode (option « Langue / Language », `/poly langue`),
@@ -103,6 +109,7 @@ other language).*
 
 ## Version
 
+`1.3.2` : licence libre **GNU GPL version 3** (fichier `LICENSE`).
 `1.3.1` : chemins des fichiers de langue compatibles macOS.
 `1.3.0` : Polypode Photo en anglais, allemand, espagnol, italien et portugais du Brésil, selon la langue choisie dans Polypode ; noms des écrans de chargement en anglais hors français. *Translated into English, German, Spanish, Italian and Brazilian Portuguese.*
 `1.2.2` : WoW Forever : les membres du groupe sont reconnus par prénom et nom de famille (spécialisation et niveau d'objet sous les modèles) ; nécessite Polypode 2.2.3 pour cela.
